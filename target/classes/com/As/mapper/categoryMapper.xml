@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.ICategoryDAO">
+
+    <resultMap id="cateMap" type="com.As.VO.Category">
+        <id property="OId" column="c_OId"/>
+        <result property="name" column="c_name"/>
+
+    </resultMap>
+
+    <sql id="cateColumns">
+        c.OId AS c_OId,
+        c.name AS c_name
+    </sql>
+
+
+    <select id="getCateList" resultMap="cateMap">
+        SELECT
+            <include refid="cateColumns"/>
+        FROM
+            wtumarket.category c
+    </select>
+
+
+
+    <select id="getByOId" resultMap="cateMap">
+        SELECT
+            <include refid="cateColumns"/>
+        FROM
+           wtumarket.category c
+        WHERE
+            c.OId=#{OId}
+    </select>
+
+    <select id="getByName" resultMap="cateMap">
+        SELECT
+            <include refid="cateColumns"/>
+        FROM
+            wtumarket.category c
+        WHERE
+            c.name=#{name}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="OId" keyColumn = "OId">
+        INSERT INTO
+            wtumarket.category(name)
+        VALUES
+            (#{category.name})
+    </insert>
+
+    <insert id="insertCate" useGeneratedKeys="true" keyProperty="OId" keyColumn = "OId">
+        INSERT INTO
+            wtumarket.category(OId, name)
+        VALUES
+            (#{category.OId},#{category.name})
+    </insert>
+
+
+    <update id="upDateByOId">
+        UPDATE wtumarket.category
+        SET
+            name = #{category.name}
+        WHERE
+            OId = #{category.OId}
+    </update>
+
+
+    <delete id="deleteByOId">
+        DELETE
+        FROM
+            wtumarket.category
+        WHERE
+            OId = #{OId}
+    </delete>
+
+    <select id="isHaveId" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.category
+        WHERE OId = #{OId}
+    </select>
+
+    <select id="isHaveName" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.category
+        WHERE name = #{name}
+    </select>
+
+
+</mapper>

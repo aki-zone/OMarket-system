@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.IUser_ItemDAO">
+    <resultMap id="itemMap" type="com.As.VO.Item">
+        <id property="OId" column="ui_itemsId"/>
+        <result property="num" column="ui_num"/>
+    </resultMap>
+
+
+    <resultMap id="user_itemMap" type="com.As.VO.User_Item">
+        <id property="userId" column="ui_userId"/>
+        <result property="itemsId" column="ui_itemsId"/>
+        <result property="num" column="ui_num"/>
+    </resultMap>
+
+    <sql id="userColumns">
+        ui.userId  AS ui_userId,
+        ui.num     AS ui_num,
+        ui.itemsId AS ui_itemsId
+    </sql>
+
+    <select id="getUIlist" resultMap="user_itemMap">
+        SELECT
+            <include refid="userColumns" />
+        FROM
+            wtumarket.user_item ui
+    </select>
+
+    <select id="getUOlist" resultType="java.lang.String">
+        SELECT
+            ui.userId  AS ui_userId
+        FROM
+           wtumarket.user_item ui
+        WHERE
+           ui.itemsId = #{itemsId}
+    </select>
+
+    <select id="getItemList" resultMap="itemMap">
+        SELECT
+            ui.num     AS ui_num,
+            ui.itemsId AS ui_itemsId
+        FROM
+            wtumarket.user_item ui
+        WHERE
+            ui.userId = #{userId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO
+            wtumarket.user_item(userId, itemsId, num)
+        VALUES
+            (#{ui.userId},#{ui.itemsId},#{ui.num})
+    </insert>
+
+    <select id="isHave" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.user_item
+        WHERE userId = #{ui.userId} and itemsId = #{ui.itemsId}
+    </select>
+
+
+    <update id="updateAdd">
+        UPDATE
+            wtumarket.user_item ui
+        SET
+            ui.num = ui.num + #{num}
+        WHERE
+            ui.userId = #{userId}
+          and
+            ui.itemsId =#{itemsId}
+    </update>
+
+
+    <delete id="delete">
+        DELETE
+        FROM
+            wtumarket.user_item ui
+        WHERE
+            ui.userId = #{userId}
+          and
+            ui.itemsId =#{itemsId}
+    </delete>
+
+
+</mapper>

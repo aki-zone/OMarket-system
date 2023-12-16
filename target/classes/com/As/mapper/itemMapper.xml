@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.IItemDAO">
+
+    <resultMap id="itemMap" type="com.As.VO.Item">
+        <id property="OId" column="i_OId"/>
+        <result property="name" column="i_name"/>
+        <result property="description" column="i_description"/>
+        <result property="price" column="i_price"/>
+        <result property="num" column="i_num"/>
+
+        <collection property="categories" ofType="com.As.VO.Category">
+            <id property="OId" column="c_OId"/>
+            <result property="name" column="c_name"/>
+        </collection>
+    </resultMap>
+
+
+
+    <sql id="itemColumns">
+        i.OId AS i_OId,
+        i.name AS i_name,
+        i.description AS i_description,
+        i.price AS i_price,
+        i.num AS i_num,
+        c.OId AS c_OId,
+        c.name AS c_name
+    </sql>
+
+    <select id="getTotalValue" resultType="java.lang.String">
+        SELECT
+            SUM(num*price) AS total_value
+        FROM
+            wtumarket.item;
+    </select>
+
+    <select id="getTotalNum" resultType="java.lang.String">
+        SELECT
+            COUNT(*) AS total_count
+        FROM
+            wtumarket.item;
+    </select>
+
+    <select id="getItemList" resultMap="itemMap">
+        SELECT
+        <include refid="itemColumns"/>
+        FROM
+            wtumarket.item i
+        LEFT JOIN
+            wtumarket.item_category ic on i.OId = ic.itemsId
+        LEFT JOIN
+            wtumarket.category c on ic.categoryId = c.OId
+    </select>
+
+    <select id="getOIdList" resultMap="itemMap">
+        SELECT
+            i.OId AS i_OId
+        FROM
+            wtumarket.item i
+    </select>
+
+    <select id="getNameList" resultMap="itemMap">
+        SELECT
+            i.OId AS i_OId,
+            i.name AS i_name
+        FROM
+            wtumarket.item i
+    </select>
+    <select id="getTextList" resultMap="itemMap">
+        SELECT
+            i.OId AS i_OId,
+            i.description AS i_description
+        FROM
+            wtumarket.item i
+    </select>
+
+    <select id="getByOId" resultMap="itemMap">
+        SELECT
+            <include refid="itemColumns"/>
+        FROM
+            wtumarket.item i
+        LEFT JOIN
+            wtumarket.item_category ic on i.OId = ic.itemsId
+        LEFT JOIN
+            wtumarket.category c on ic.categoryId = c.OId
+        WHERE
+            i.OId = #{OId}
+    </select>
+
+
+    <select id="getByOO" resultMap="itemMap">
+        SELECT
+            i.OId AS i_OId,
+            i.name AS i_name,
+            i.description AS i_description,
+            i.price AS i_price,
+            ui.num AS i_num,
+            c.OId AS c_OId,
+            c.name AS c_name
+        FROM
+            wtumarket.item i
+        LEFT JOIN
+            wtumarket.item_category ic on i.OId = ic.itemsId
+        LEFT JOIN
+            wtumarket.category c on ic.categoryId = c.OId
+        LEFT JOIN
+            wtumarket.user_item ui on i.OId = ui.itemsId
+        WHERE
+            ui.userId = #{ownerOId}
+
+
+    </select>
+
+
+    <select id="getIOByUO" resultType="java.lang.String">
+        SELECT
+            OId
+        FROM
+            wtumarket.item i
+        WHERE
+            i.OId = (
+            SELECT
+                itemsId
+            FROM
+                wtumarket.user_item ui
+            WHERE
+                ui.userId = #{ownerOId}
+            )
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="OId"  keyColumn = "OId">
+        INSERT INTO
+            wtumarket.item(name,description,price,num)
+        VALUES
+            (#{item.name},#{item.description},#{item.price},#{item.num})
+    </insert>
+
+    <insert id="insertItem" useGeneratedKeys="true" keyProperty="OId"  keyColumn = "OId">
+        INSERT INTO
+            wtumarket.item(OId,name,description,price,num)
+        VALUES
+            (#{item.OId},#{item.name},#{item.description},#{item.price},#{item.num})
+    </insert>
+
+
+    <update id="update">
+        UPDATE wtumarket.item
+        SET
+            name = #{item.name},
+            price = #{item.price},
+            description = #{item.description},
+            num = #{item.num}
+        WHERE OId = #{item.OId}
+    </update>
+
+    <update id="updateAdd">
+        UPDATE wtumarket.item
+        SET
+            num = num + #{addNum}
+        WHERE OId = #{OId}
+    </update>
+
+    <update id="updatePrice">
+        UPDATE wtumarket.item
+        SET
+            price = #{price}
+        WHERE OId = #{OId}
+    </update>
+
+    <select id="isHaveId" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.item
+        WHERE OId = #{OId}
+    </select>
+
+
+    <delete id="deleteByOId">
+        DELETE
+        FROM
+            item
+        WHERE
+            OId = #{OId}
+    </delete>
+
+</mapper>

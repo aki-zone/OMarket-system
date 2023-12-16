@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.IItem_CateDAO">
+
+    <resultMap id="itemMap" type="com.As.VO.Item">
+        <id property="OId" column="i_OId"/>
+    </resultMap>
+
+    <resultMap id="cateMap" type="com.As.VO.Category">
+        <id property="OId" column="c_OId"/>
+    </resultMap>
+
+    <resultMap id="item_cateMap" type="com.As.VO.Item_Category">
+        <id property="itemsId" column="ic_itemsId"/>
+        <result property="categoryId" column="ic_categoryId"/>
+    </resultMap>
+
+
+    <sql id="icColumns">
+        ic.itemsId AS i_OId,
+        ic.categoryId AS c_OId
+    </sql>
+
+
+    <select id="getICList" resultMap="item_cateMap">
+        SELECT
+            ic.itemsId AS ic_itemsId,
+            ic.categoryId AS ic_categoryId
+        FROM
+            wtumarket.item_category ic
+
+    </select>
+
+    <select id="getCateId" resultMap="cateMap">
+        SELECT
+            <include refid="icColumns"/>
+        FROM
+           wtumarket.item_category ic
+        WHERE
+           ic.itemsId = #{itemsId}
+    </select>
+
+    <select id="getItemId" resultMap="itemMap">
+        SELECT
+            <include refid="icColumns"/>
+        FROM
+            wtumarket.item_category ic
+        WHERE
+            ic.categoryId = #{categoryId}
+    </select>
+
+    <select id="isHave" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.item_category
+        WHERE itemsId = #{ic.itemsId} and categoryId = #{ic.categoryId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO
+            wtumarket.item_category(itemsId,categoryId)
+        VALUES
+            (#{ic.itemsId},#{ic.categoryId})
+    </insert>
+
+
+    <delete id="delete">
+        DELETE
+        FROM
+            wtumarket.item_category ic
+        WHERE
+            ic.itemsId = #{itemsId} AND ic.categoryId = #{categoryId}
+    </delete>
+
+
+</mapper>

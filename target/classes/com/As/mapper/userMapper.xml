@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.IUserDAO">
+
+    <resultMap id="userMap" type="com.As.VO.User">
+        <id property="OId" column="u_OId"/>
+        <result property="status" column="u_status"/>
+        <result property="username" column="u_username"/>
+        <result property="password" column="u_password"/>
+        <result property="phoneNum" column="u_phoneNum"/>
+        <result property="email" column="u_email"/>
+        <result property="address" column="u_address"/>
+        <result property="regsTime" column="u_regsTime"/>
+        <result property="balances" column="u_balances"/>
+
+        <collection property="orders" ofType="com.As.VO.Order" >
+            <id property="OId" column="o_OId"/>
+            <result property="status" column="o_status"/>
+            <result property="buyerId" column="o_buyerId"/>
+            <result property="sellerId" column="o_sellerId"/>
+            <result property="itemsId" column="o_itemsId"/>
+            <result property="time" column="o_time"/>
+            <result property="num" column="o_num"/>
+            <result property="value" column="o_value"/>
+        </collection>
+
+        <collection property="items" ofType="com.As.VO.Item" >
+            <id property="OId" column="i_OId"/>
+            <result property="name" column="i_name"/>
+            <result property="description" column="i_description"/>
+            <result property="price" column="i_price"/>
+            <result property="num" column="ui_num"/>
+        </collection>
+    </resultMap>
+
+    <sql id="userColumns">
+        u.OId AS u_OId,
+        u.status AS u_status,
+        u.username AS u_username,
+        u.password AS u_password,
+        u.phoneNum AS u_phoneNum,
+        u.email AS u_email,
+        u.address AS u_address,
+        u.regsTime AS u_regsTime,
+        u.balances AS u_balances,
+        o.OId AS o_OId,
+        o.status AS o_status,
+        o.buyerId AS o_buyerId,
+        o.sellerId AS o_sellerId,
+        o.itemsId AS o_itemsId,
+        o.time AS o_time,
+        o.num AS o_num,
+        o.value AS o_value,
+        i.OId AS i_OId,
+        i.name AS i_name,
+        i.description AS i_description,
+        i.price AS i_price,
+        i.num AS i_num,
+        ui.itemsId AS ui_itemsId,
+        ui.userId AS ui_userId,
+        ui.num AS ui_num
+    </sql>
+
+
+    <select id="getTotalValue" resultType="java.lang.String">
+        SELECT
+            SUM(balances) AS total_balances
+        FROM
+            wtumarket.user;
+    </select>
+
+    <select id="getTotalNum" resultType="java.lang.String">
+        SELECT
+            COUNT(*) AS total_count
+        FROM
+            wtumarket.user;
+    </select>
+
+    <select id="getUserList" resultMap="userMap">
+        SELECT
+            <include refid="userColumns" />
+        FROM
+            wtumarket.user u
+                LEFT JOIN
+            wtumarket.order o on u.OId = o.buyerId OR u.OId = o.sellerId
+                LEFT JOIN
+            wtumarket.user_item ui on ui.userId = u.OId
+                LEFT JOIN
+            wtumarket.item i on ui.itemsId = i.OId
+    </select>
+
+
+    <select id="getOIdList" resultMap="userMap" >
+        SELECT
+            u.OId AS u_OId
+        FROM
+            wtumarket.user u
+    </select>
+
+    <select id="getNameList" resultMap="userMap" >
+        SELECT
+            u.OId AS u_OId,
+            u.username AS u_username
+        FROM
+            wtumarket.user u
+    </select>
+
+    <select id="getPhoneNumList" resultMap="userMap" >
+        SELECT
+            u.OId AS u_OId,
+            u.phoneNum AS u_phoneNum
+        FROM
+            wtumarket.user u
+    </select>
+
+    <select id="getMailList" resultMap="userMap" >
+        SELECT
+            u.OId AS u_OId,
+            u.email AS u_email
+        FROM
+            wtumarket.user u
+    </select>
+
+   <select id="getByOId"  resultMap="userMap">
+       SELECT
+            <include refid="userColumns" />
+       FROM
+           wtumarket.user u
+                LEFT JOIN
+           wtumarket.order o on u.OId = o.buyerId OR u.OId = o.sellerId
+                LEFT JOIN
+           wtumarket.user_item ui on ui.userId = u.OId
+                LEFT JOIN
+           wtumarket.item i on ui.itemsId = i.OId
+       WHERE
+           u.OId = #{OId}
+    </select>
+
+    <select id="getByPP" resultMap="userMap">
+        SELECT
+            <include refid="userColumns" />
+        FROM
+            wtumarket.user u
+                LEFT JOIN
+            wtumarket.order o on u.OId = o.buyerId OR u.OId = o.sellerId
+                LEFT JOIN
+            wtumarket.user_item ui on ui.userId = u.OId
+                LEFT JOIN
+            wtumarket.item i on ui.itemsId = i.OId
+        WHERE
+            u.phoneNum = #{phone} AND u.password = #{password}
+    </select>
+
+
+    <select id="getByOP" resultMap="userMap">
+        SELECT
+        <include refid="userColumns" />
+        FROM
+            wtumarket.user u
+                LEFT JOIN
+            wtumarket.order o on u.OId = o.buyerId OR u.OId = o.sellerId
+                LEFT JOIN
+            wtumarket.user_item ui on ui.userId = u.OId
+                LEFT JOIN
+            wtumarket.item i on ui.itemsId = i.OId
+        WHERE
+        u.OId = #{OId} AND u.password = #{password}
+    </select>
+
+
+    <select id="getOrderIdList" resultType="java.lang.String" >
+        SELECT
+            o.OId
+        FROM
+            wtumarket.`order` o
+        WHERE
+            o.sellerId = #{OId} or o.buyerId =#{OId}
+    </select>
+
+    <select id="getItemIdList" resultType="java.lang.String" >
+        SELECT
+            ui.itemsId
+        FROM
+            wtumarket.user_item ui
+        WHERE
+            ui.userId = #{OId}
+    </select>
+
+    <select id="isHaveId" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.user
+        WHERE OId = #{OId}
+    </select>
+
+    <select id="isHavePhone" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.user
+        WHERE phoneNum = #{phoneNum}
+    </select>
+
+
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="OId"  keyColumn = "OId">
+        INSERT INTO
+            wtumarket.user(username, password, phoneNum, email, address, balances, regsTime)
+        VALUES
+            (#{user.username},#{user.password},#{user.phoneNum},#{user.email},#{user.address},#{user.balances},#{user.regsTime})
+    </insert>
+
+
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="OId"  keyColumn = "OId">
+        INSERT INTO
+            wtumarket.user(OId,username, password, phoneNum, email, address, balances, regsTime)
+        VALUES
+            (#{user.OId},#{user.username},#{user.password},#{user.phoneNum},#{user.email},#{user.address},#{user.balances},#{user.regsTime})
+    </insert>
+
+
+
+    <update id="update">
+        UPDATE wtumarket.user
+        SET
+            status = #{user.status},
+            username = #{user.username},
+            password = #{user.password},
+            phoneNum = #{user.phoneNum},
+            email = #{user.email},
+            address = #{user.address},
+            regsTime = #{user.regsTime},
+            balances = #{user.balances}
+        WHERE OId = #{user.OId}
+    </update>
+
+    <update id="userPay">
+        UPDATE wtumarket.user
+        SET
+            balances = balances + #{money}
+        WHERE OId = #{OId}
+    </update>
+
+
+    <delete id="delete">
+        DELETE
+        FROM
+            user
+        WHERE
+            OId = #{OId}
+    </delete>
+
+
+</mapper>

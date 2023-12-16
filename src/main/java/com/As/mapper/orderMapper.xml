@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--mapper文件相当于DAO接口的‘实现类’，namespace属性要指定`实现`DAO接口的全限定名-->
+<mapper namespace="com.As.dao.IOrderDAO">
+
+    <resultMap id="orderMap" type="com.As.VO.Order">
+        <id property="OId" column="o_OId"/>
+        <result property="status" column="o_status"/>
+        <result property="buyerId" column="o_buyerId"/>
+        <result property="sellerId" column="o_sellerId"/>
+        <result property="itemsId" column="o_itemsId"/>
+        <result property="time" column="o_time"/>
+        <result property="num" column="o_num"/>
+        <result property="value" column="o_value"/>
+    </resultMap>
+
+    <sql id="orderColumns">
+        o.OId AS o_OId,
+        o.status AS o_status,
+        o.buyerId AS o_buyerId,
+        o.sellerId AS o_sellerId,
+        o.itemsId AS o_itemsId,
+        o.time AS o_time,
+        o.num AS o_num,
+        o.value AS o_value
+    </sql>
+
+    <select id="getTotalValue" resultType="java.lang.String">
+        SELECT
+            SUM(value) AS total_value
+        FROM
+            wtumarket.`order`;
+    </select>
+
+    <select id="getTotalNum" resultType="java.lang.String">
+        SELECT
+            COUNT(*) AS total_count
+        FROM
+            wtumarket.`order`;
+    </select>
+
+    <select id="getOrderList" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+            wtumarket.order o
+    </select>
+
+
+    <select id="getByOId" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+           wtumarket.order o
+        WHERE
+           o.OId = #{OId}
+    </select>
+
+    <select id="getByStatus" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+            wtumarket.order o
+        WHERE
+            o.status = #{status}
+    </select>
+
+    <select id="getByBO" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+            wtumarket.order o
+        WHERE
+            o.buyerId = #{buyerId}
+    </select>
+
+    <select id="getBySO" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+            wtumarket.order o
+        WHERE
+            o.sellerId = #{sellerId}
+    </select>
+
+    <select id="getByIO" resultMap="orderMap">
+        SELECT
+            <include refid="orderColumns"/>
+        FROM
+            wtumarket.order o
+        WHERE
+            o.itemsId= #{IO}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="OId" keyColumn = "OId">
+        INSERT INTO
+            wtumarket.order(status,buyerId,sellerId,itemsId,time,num,value)
+        VALUES
+            (#{order.status}, #{order.buyerId}, #{order.sellerId}, #{order.itemsId}, #{order.time},#{order.num},#{order.value})
+    </insert>
+
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="OId" keyColumn = "OId">
+        INSERT INTO
+            wtumarket.order(OId,status,buyerId,sellerId,itemsId,time,num,value)
+        VALUES
+            (#{order.OId},#{order.status}, #{order.buyerId}, #{order.sellerId}, #{order.itemsId}, #{order.time},#{order.num},#{order.value})
+    </insert>
+
+    <select id="isHaveId" resultType="boolean">
+        SELECT IF(COUNT(*) > 0, true, false)
+        FROM wtumarket.order
+        WHERE OId = #{OId}
+    </select>
+
+    <update id="update">
+        UPDATE wtumarket.order
+        SET
+            status   = #{order.status},
+            buyerId  = #{order.buyerId},
+            sellerId = #{order.sellerId},
+            itemsId  = #{order.itemsId},
+            time     = #{order.time},
+            num      = #{order.num}
+        WHERE OId = #{order.OId}
+    </update>
+
+
+    <delete id="delete">
+        DELETE
+        FROM
+            wtumarket.order o
+        WHERE
+            o.OId = #{OId}
+    </delete>
+
+
+</mapper>
