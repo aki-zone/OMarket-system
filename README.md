@@ -45,18 +45,14 @@ This is an innovative personal open-source project that simulates MySQL command 
 
 ## 项目价值 | Project Value
 
-1. 展示指令集设计能力
-2. 模拟真实数据库交互模式
-3. 实现复杂后端系统架构
-4. 体现面向对象设计思想
+1. 展示指令集设计能力  /  Demonstrate Command Set Design Skills
+2. 模拟真实数据库交互模式 / Simulate Real Database Interaction Mode
+3. 实现复杂后端系统架构 / Implement Complex Backend System Architecture
+4. 体现面向对象设计思想 / Reflect Object-Oriented Design Philosophy
 
-1. Demonstrate Command Set Design Skills
-2. Simulate Real Database Interaction Mode
-3. Implement Complex Backend System Architecture
-4. Reflect Object-Oriented Design Philosophy
 
 ## 开发者 | Developer
-Akizora
+Aki
 
 ## 许可证 | License
 Copyright (c) [2022] [akizora]
