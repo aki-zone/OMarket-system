@@ -19,7 +19,6 @@
 - 
 ## 指令集示例
 
-### 指令包装样例
 ```bash
 # 登录 | Login
 -login ["1"][account:[phoneNum="13800138000",password="123456"]]
